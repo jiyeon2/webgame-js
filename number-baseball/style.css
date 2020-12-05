@@ -34,6 +34,8 @@ button, input{
     min-height: 80%;
     background-color: #f0f4f5;
     display: flex;
+    border: 24px solid transparent;
+    border-image: url("./baseball.svg") 32 round;
 }
 
 .left-section,
