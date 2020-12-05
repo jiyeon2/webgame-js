@@ -1,0 +1,113 @@
+:root{
+    --background-color: beige;
+    --button-color: aquamarine;
+}
+html{
+    height: 100%;
+}
+body{
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 2rem;
+    
+}
+h1{
+    margin: 0;
+}
+
+.container{
+    width: 420px;
+    height: 540px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: var(--background-color);
+    padding: 2rem 2rem;
+
+    perspective: 800px;
+}
+
+
+.container.cover{
+    z-index: 10;
+}
+.container.cover.hide, .container.game.hide{
+    display: none;
+}
+.container.cover h1{
+    text-align: center;
+}
+.container.cover button{
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
+    border: none;
+    background-color: var(--button-color);
+    padding: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.2),
+                0px 2px 5px rgba(0,0,0,0.2);
+}
+.cover button:focus{
+    animation: scale 0.25s ease-in-out;
+}
+@keyframes scale{
+    0%{
+        transform: scale(1);
+    }
+    10%{
+        transform: scale(1.02);
+    }
+    100%{
+        transform: scale(1);
+    }
+}
+
+.info{
+    margin-bottom: 2rem;
+}
+
+.board{
+    width: 320px;
+    height: 320px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: space-between;
+    transform-style: preserve-3d;
+    transform:  rotateX(45deg);
+}
+
+.board__cell{
+    width: 100px;
+    height: 100px;
+    background-color: var(--button-color);
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: ease-in-out 1s grow ;
+    cursor: pointer;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+}
+.board__cell:hover{
+    transform: translateZ(10px);
+}
+@keyframes grow{
+    0%{
+        transform: scaleX(0.2) scaleY(0.2);
+    }
+    50%{
+        transform: scaleX(1) scaleY(0.2);
+    }
+    100%{
+        transform: scaleX(1) scaleY(1);
+    }
+}
