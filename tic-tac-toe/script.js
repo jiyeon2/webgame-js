@@ -97,9 +97,9 @@ class TicTacToe {
     // 3칸이 이어졌는지 확인
     // 가로줄
     if (
-      this.board[0].every === this.player ||
-      this.board[1].every === this.player ||
-      this.board[2].every === this.player
+      this.board[0].every((mark) => mark === this.player) ||
+      this.board[1].every((mark) => mark === this.player) ||
+      this.board[2].every((mark) => mark === this.player)
     ) {
       return true;
     }
