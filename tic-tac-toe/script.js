@@ -5,31 +5,45 @@ class TicTacToe {
     this.playing = false;
 
     this.cells = document.querySelectorAll(".board__cell");
-    this.startButton = document.querySelector(".cover button");
+    this.startButtons = document.querySelectorAll(".btn-start");
     this.coverContainer = document.querySelector(".cover");
     this.gameContainer = document.querySelector(".game");
     this.playerDisplay = document.querySelector(".player__id");
     this.resultDisplay = document.querySelector(".result");
+    this.info = document.querySelector(".info");
 
     this.cells.forEach((cell) => {
       cell.addEventListener("click", this.cellClickHandler.bind(this));
     });
-    this.startButton.addEventListener("click", this.startNewGame.bind(this));
+    this.startButtons.forEach((btn) => {
+      btn.addEventListener("click", this.startNewGame.bind(this));
+    });
 
     this.init();
+  }
+
+  init() {
+    this.player = "X";
+    this.board = Array.from({ length: 3 }, () => {
+      return Array.from({ length: 3 }, () => null);
+    });
+    this.playing = true;
+    this.cells.forEach((cell) => (cell.textContent = ""));
   }
 
   startNewGame() {
     console.log("새게임");
     this.coverContainer.classList.add("hide");
+    this.resultDisplay.classList.add("hide");
     this.gameContainer.classList.remove("hide");
+    this.info.classList.remove("blur");
     this.init();
   }
 
   finishGame() {
     this.playing = false;
-    this.coverContainer.classList.remove("hide");
-    this.gameContainer.classList.add("hide");
+    // this.coverContainer.classList.remove("hide");
+    // this.gameContainer.classList.add("hide");
   }
 
   cellClickHandler(e) {
@@ -57,15 +71,6 @@ class TicTacToe {
     }
   }
 
-  init() {
-    this.player = "X";
-    this.board = Array.from({ length: 3 }, () => {
-      return Array.from({ length: 3 }, () => null);
-    });
-    this.playing = true;
-    this.cells.forEach((cell) => (cell.textContent = ""));
-  }
-
   changePlayer() {
     this.player = this.player === "X" ? "O" : "X";
     this.playerDisplay.textContent = this.player;
@@ -73,7 +78,9 @@ class TicTacToe {
 
   displayText(text) {
     // cover 에 표시
-    this.resultDisplay.textContent = text;
+    this.resultDisplay.querySelector(".result-text").textContent = text;
+    this.resultDisplay.classList.remove("hide");
+    this.info.classList.add("blur");
     console.log(text);
   }
 

@@ -11,8 +11,7 @@
 <body>
     <div class="container cover">
         <h1>틱택토</h1>
-        <p class="result"></p>
-        <button type="button">새게임</button>
+        <button class="btn-start" type="button">새게임</button>
     </div>
     <div class="container game hide">
         <div class="info">
@@ -30,6 +29,11 @@
             <div class="board__cell" data-row="2" data-col="0"></div>
             <div class="board__cell" data-row="2" data-col="1"></div>
             <div class="board__cell" data-row="2" data-col="2"></div>
+        </div>
+
+        <div class="result hide">
+            <p class="result-text"></p>
+            <button class="btn-start" type="button">다시 하기</button>
         </div>
     </div>
     <script src="script.js"></script>
