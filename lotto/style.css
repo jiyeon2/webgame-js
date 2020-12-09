@@ -1,0 +1,17 @@
+.ball{
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem;
+    border: 2px solid black;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.numbers__bonus .ball{
+    box-shadow: 0 0 0 2px yellow inset;
+}
+
+.numbers__regular, .numbers__bonus{
+    display: flex;
+}
