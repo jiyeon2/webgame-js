@@ -7,12 +7,18 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="computer"></div>
-    <div>
-        <button class="btn" id="scissor">가위</button>
-        <button class="btn" id="rock">바위</button>
-        <button class="btn" id="paper">보</button>
+    <h1>~~ 가위바위보 ~~</h1>
+    <div class="container">
+        <div id="computer"></div>
+        <div id="mine">
+            <button class="btn" id="scissor">✌ 가위</button>
+            <button class="btn" id="rock">👊 바위</button>
+            <button class="btn" id="paper">🖐 보</button>
+            <span class="badge result"></span>
+        </div>
+        <p class="combo"><span>1</span>연승</p>
     </div>
+    
     <script src="script.js"></script>
 </body>
 </html>
