@@ -1,43 +1,64 @@
-const opponentDisplay = document.querySelector(".opponent span");
-const reresultDisplay = document.querySelector(".result span");
+let imageCoord = 0;
 
-const dictionary = {
-  scissors: "가위",
-  rock: "바위",
-  paper: "보",
+let options = {
+  scissor: 0,
+  rock: -300,
+  paper: -600,
 };
-const options = ["rock", "scissors", "paper"];
 
-const buttons = document.querySelectorAll("button[data-value]");
-
-function clearDisplay() {
-  opponentDisplay.textContent = "";
-  reresultDisplay.textContent = "";
-  buttons.forEach((button) => {
-    button.classList.remove("clicked");
-  });
+function getComputerSelection(imageCoord) {
+  return Object.entries(options).find((v) => {
+    return v[1] === imageCoord;
+  })[0];
 }
-buttons.forEach((button) => {
-  button.addEventListener("click", (e) => {
-    clearDisplay();
-    e.target.classList.add("clicked");
 
-    const opponentSelection = Math.floor(Math.random() * 3);
-    const mine = e.target.dataset.value;
+let interval;
 
-    let resultText = "";
-    if (options.indexOf(mine) === opponentSelection) {
-      resultText = "비겼습니다";
-    } else if (
-      options.indexOf(mine) - opponentSelection === -1 ||
-      options.indexOf(mine) - opponentSelection === 2
-    ) {
-      resultText = "이겼습니다";
+function intervalMaker() {
+  interval = setInterval(() => {
+    if (imageCoord === options.rock) {
+      imageCoord = options.scissor;
+    } else if (imageCoord === options.scissor) {
+      imageCoord = options.paper;
     } else {
-      resultText = "졌습니다";
+      imageCoord = options.rock;
     }
+    document.querySelector(
+      "#computer"
+    ).style.background = `url(image.jpg) ${imageCoord}px 0`;
+  }, 100);
+}
 
-    opponentDisplay.textContent = dictionary[options[opponentSelection]];
-    reresultDisplay.textContent = resultText;
+intervalMaker();
+
+document.querySelectorAll(".btn").forEach((btn) => {
+  btn.addEventListener("click", function () {
+    clearInterval(interval);
+    setTimeout(() => {
+      intervalMaker();
+    }, 1000);
+    let koDict = {
+      가위: "scissor",
+      바위: "rock",
+      보: "paper",
+    };
+    let mySelection = koDict[this.textContent];
+    let computerSelection = getComputerSelection(imageCoord);
+    console.log(mySelection, computerSelection);
+
+    const score = {
+      scissor: 0,
+      rock: 1,
+      paper: -1,
+    };
+
+    let scoreDiff = score[mySelection] - score[computerSelection];
+    if (scoreDiff === 0) {
+      console.log("비겼습니다");
+    } else if ([-1, 2].includes(scoreDiff)) {
+      console.log("졌습니다");
+    } else {
+      console.log("이겼습니다");
+    }
   });
 });
