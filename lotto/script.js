@@ -39,8 +39,14 @@ btnGetNumber.addEventListener("click", () => {
   emptyNumbersContainer();
 
   const { regular, bonus } = getRandomNumbers();
-  regular.forEach((number) => {
-    appendBallElement(number, regularNumbersContainer);
-  });
+
+  for (var i = 0; i < regular.length; i += 1) {
+    (function closure(j) {
+      setTimeout(function () {
+        appendBallElement(regular[j], regularNumbersContainer);
+      }, j * 1000);
+    })(i); // 즉시실행함수 - 선언과 동시에 실행
+  }
+
   appendBallElement(bonus, bonusNumberContainer);
 });
