@@ -56,6 +56,7 @@ document.querySelector("#exec").addEventListener("click", () => {
         }
       });
       td.addEventListener("click", (e) => {
+        e.currentTarget.classList.add("opened");
         // 클릭 시 주변 지뢰개수
         let parentTr = e.currentTarget.closest("tr");
         let parentTbody = e.currentTarget.closest("tbody");
@@ -86,6 +87,40 @@ document.querySelector("#exec").addEventListener("click", () => {
           }
           let numOfMines = arounds.filter((v) => v === "x").length;
           e.currentTarget.textContent = numOfMines;
+          if (numOfMines === 0) {
+            //주변 8칸 동시 오픈
+            let aroundCells = [
+              tbody.children[row].children[col - 1],
+              tbody.children[row].children[col + 1],
+            ];
+
+            if (tbody.children[row - 1]) {
+              aroundCells = aroundCells.concat([
+                tbody.children[row - 1].children[col - 1],
+                tbody.children[row - 1].children[col],
+                tbody.children[row - 1].children[col + 1],
+              ]);
+            }
+            if (tbody.children[row + 1]) {
+              aroundCells = aroundCells.concat([
+                tbody.children[row + 1].children[col - 1],
+                tbody.children[row + 1].children[col],
+                tbody.children[row + 1].children[col + 1],
+              ]);
+            }
+            console.log(aroundCells);
+            console.log(aroundCells.filter((v) => !!v));
+            aroundCells
+              .filter(function (v) {
+                return !!v;
+              })
+              .forEach(function (nextCell) {
+                nextCell.click();
+              });
+            // aroundCells
+            //   .filter((v) => !!v) // 배열에서 null, undefined 제거
+            //   .forEach((nextCell) => nextCell.click());
+          }
         }
       });
       tr.append(td);
