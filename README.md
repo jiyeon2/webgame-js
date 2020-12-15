@@ -4,3 +4,4 @@
 
 1. [숫자야구](https://jiyeon2.github.io/webgame-js/number-baseball)
 2. [틱택토](https://jiyeon2.github.io/webgame-js/tic-tac-toe)
+2. [가위바위보](https://jiyeon2.github.io/webgame-js/rock-scissors-paper)
