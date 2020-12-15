@@ -2,6 +2,16 @@ let tbody = document.querySelector("#table tbody");
 let dataset = [];
 let stopFlag = false;
 let openedCells = 0;
+// dataset에서 칸의 상태 표시할 코드표
+const codeTable = {
+  opened: -1,
+  question: -2,
+  flag: -3,
+  questionMine: -4,
+  flagMine: -5,
+  mine: 1,
+  normal: 0,
+};
 
 document.querySelector("#exec").addEventListener("click", () => {
   // 내부 먼저 초기화
@@ -14,6 +24,7 @@ document.querySelector("#exec").addEventListener("click", () => {
   let hor = document.querySelector("#hor").value;
   let ver = document.querySelector("#ver").value;
   let mine = document.querySelector("#mine").value;
+  // 지뢰 개수 제한 필요(칸 크기보다 작도록)
 
   // 피셔 예이츠 셔플로 지뢰 위치 뽑기 0~99
   let candidates = Array(hor * ver)
@@ -22,7 +33,8 @@ document.querySelector("#exec").addEventListener("click", () => {
 
   let shuffle = [];
 
-  while (shuffle.length < mine) {
+  // while (shuffle.length < mine) {
+  while (candidates.length > hor * ver - mine) {
     let num = candidates.splice(
       Math.floor(Math.random() * candidates.length),
       1
@@ -37,7 +49,7 @@ document.querySelector("#exec").addEventListener("click", () => {
     let tr = document.createElement("tr");
     dataset.push(arr);
     for (let j = 0; j < hor; j += 1) {
-      arr.push(0);
+      arr.push(codeTable.normal);
       let td = document.createElement("td");
       td.addEventListener("contextmenu", (e) => {
         e.preventDefault();
@@ -52,15 +64,35 @@ document.querySelector("#exec").addEventListener("click", () => {
           e.currentTarget
         );
         let row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+        if (dataset[row][col] === codeTable.opened) {
+          return;
+        }
+
         if (["", "x"].includes(e.currentTarget.textContent)) {
           e.currentTarget.textContent = "!";
+          e.currentTarget.classList.add("flag");
+          if (dataset[row][col] === codeTable.mine) {
+            dataset[row][col] = codeTable.flagMine;
+          } else {
+            dataset[row][col] = codeTable.flag;
+          }
         } else if (e.currentTarget.textContent === "!") {
           e.currentTarget.textContent = "?";
+          e.currentTarget.classList.remove("flag");
+          e.currentTarget.classList.add("question");
+          if (dataset[row][col] === codeTable.flagMine) {
+            dataset[row][col] = codeTable.questionMine;
+          } else {
+            dataset[row][col] = codeTable.question;
+          }
         } else if (e.currentTarget.textContent === "?") {
-          if (dataset[row][col] === 0) {
-            e.currentTarget.textContent = "";
-          } else if (dataset[row][col] === "x") {
+          e.currentTarget.classList.remove("question");
+          if (dataset[row][col] === codeTable.questionMine) {
             e.currentTarget.textContent = "x";
+            dataset[row][col] = codeTable.mine;
+          } else {
+            e.currentTarget.textContent = "";
+            dataset[row][col] = codeTable.normal;
           }
         }
       });
@@ -69,9 +101,7 @@ document.querySelector("#exec").addEventListener("click", () => {
         if (stopFlag) {
           return;
         }
-        if (["?", "!"].includes(e.currentTarget.textContent)) {
-          return;
-        }
+
         let parentTr = e.currentTarget.closest("tr");
         let parentTbody = e.currentTarget.closest("tbody");
         let col = Array.prototype.indexOf.call(
@@ -79,15 +109,23 @@ document.querySelector("#exec").addEventListener("click", () => {
           e.currentTarget
         );
         let row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
-        if (dataset[row][col] === 1) {
-          // 이미 열린 칸일경우
+
+        if (
+          [
+            codeTable.opened,
+            codeTable.flag,
+            codeTable.flagMine,
+            codeTable.questionMine,
+            codeTable.question,
+          ].includes(dataset[row][col])
+        ) {
           return;
         }
 
         openedCells += 1;
         e.currentTarget.classList.add("opened");
 
-        if (dataset[row][col] === "x") {
+        if (dataset[row][col] === codeTable.mine) {
           // 지뢰인경우
           e.currentTarget.textContent = "펑";
           document.querySelector("#result").textContent = "실패ㅜㅜ";
@@ -109,11 +147,17 @@ document.querySelector("#exec").addEventListener("click", () => {
               dataset[row + 1][col + 1],
             ]);
           }
-          let numOfMines = arounds.filter((v) => v === "x").length;
+          let numOfMines = arounds.filter((v) => {
+            return [
+              codeTable.mine,
+              codeTable.flagMine,
+              codeTable.questionMine,
+            ].includes(v);
+          }).length;
           // numOfMines 가 false인 값이면 ''를 쓰도록
           // 거짓인 값:  false, '' ,0, null, undefined, NaN
           e.currentTarget.textContent = numOfMines || "";
-          dataset[row][col] = 1; // 한번 클릭된 칸은 1로 바꾸어 다시 클릭됨을 막기
+          dataset[row][col] = codeTable.opened; // 한번 클릭된 칸은 codeTable.opened로 바꾸어 다시 클릭됨을 막기
           if (numOfMines === 0) {
             //주변 8칸 동시 오픈
             let aroundCells = [
@@ -149,7 +193,7 @@ document.querySelector("#exec").addEventListener("click", () => {
                   parentTbody.children,
                   parentTr
                 );
-                if (dataset[row][col] !== 1) {
+                if (dataset[row][col] !== codeTable.opened) {
                   nextCell.click();
                 }
               });
@@ -168,10 +212,10 @@ document.querySelector("#exec").addEventListener("click", () => {
   // 지뢰 심기
   for (let k = 0; k < shuffle.length; k++) {
     // 인덱스 유의
-    let col = Math.floor(shuffle[k] / 10);
-    let row = shuffle[k] % 10;
+    let col = Math.floor(shuffle[k] / ver);
+    let row = shuffle[k] % hor;
     tbody.children[col].children[row].textContent = "x";
-    dataset[col][row] = "x";
+    dataset[col][row] = codeTable.mine;
   }
   console.table(dataset);
 });
