@@ -1,10 +1,15 @@
 let tbody = document.querySelector("#table tbody");
-
 let dataset = [];
+let stopFlag = false;
+let openedCells = 0;
 
 document.querySelector("#exec").addEventListener("click", () => {
+  // 내부 먼저 초기화
   tbody.innerHTML = "";
   dataset = [];
+  stopFlag = false;
+  openedCells = 0;
+  document.querySelector("#result").textContent = "";
 
   let hor = document.querySelector("#hor").value;
   let ver = document.querySelector("#ver").value;
@@ -32,10 +37,14 @@ document.querySelector("#exec").addEventListener("click", () => {
     let tr = document.createElement("tr");
     dataset.push(arr);
     for (let j = 0; j < hor; j += 1) {
-      arr.push(1);
+      arr.push(0);
       let td = document.createElement("td");
       td.addEventListener("contextmenu", (e) => {
         e.preventDefault();
+        if (stopFlag) {
+          return;
+        }
+
         let parentTr = e.currentTarget.closest("tr");
         let parentTbody = e.currentTarget.closest("tbody");
         let col = Array.prototype.indexOf.call(
@@ -48,7 +57,7 @@ document.querySelector("#exec").addEventListener("click", () => {
         } else if (e.currentTarget.textContent === "!") {
           e.currentTarget.textContent = "?";
         } else if (e.currentTarget.textContent === "?") {
-          if (dataset[row][col] === 1) {
+          if (dataset[row][col] === 0) {
             e.currentTarget.textContent = "";
           } else if (dataset[row][col] === "x") {
             e.currentTarget.textContent = "x";
@@ -56,8 +65,13 @@ document.querySelector("#exec").addEventListener("click", () => {
         }
       });
       td.addEventListener("click", (e) => {
-        e.currentTarget.classList.add("opened");
-        // 클릭 시 주변 지뢰개수
+        // 클릭했을 때
+        if (stopFlag) {
+          return;
+        }
+        if (["?", "!"].includes(e.currentTarget.textContent)) {
+          return;
+        }
         let parentTr = e.currentTarget.closest("tr");
         let parentTbody = e.currentTarget.closest("tbody");
         let col = Array.prototype.indexOf.call(
@@ -65,9 +79,19 @@ document.querySelector("#exec").addEventListener("click", () => {
           e.currentTarget
         );
         let row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+        if (dataset[row][col] === 1) {
+          // 이미 열린 칸일경우
+          return;
+        }
+
+        openedCells += 1;
+        e.currentTarget.classList.add("opened");
+
         if (dataset[row][col] === "x") {
           // 지뢰인경우
           e.currentTarget.textContent = "펑";
+          document.querySelector("#result").textContent = "실패ㅜㅜ";
+          stopFlag = true;
         } else {
           // 지뢰가 아닌경우 주변 지뢰개수 표시
           let arounds = [dataset[row][col - 1], dataset[row][col + 1]];
@@ -86,7 +110,10 @@ document.querySelector("#exec").addEventListener("click", () => {
             ]);
           }
           let numOfMines = arounds.filter((v) => v === "x").length;
-          e.currentTarget.textContent = numOfMines;
+          // numOfMines 가 false인 값이면 ''를 쓰도록
+          // 거짓인 값:  false, '' ,0, null, undefined, NaN
+          e.currentTarget.textContent = numOfMines || "";
+          dataset[row][col] = 1; // 한번 클릭된 칸은 1로 바꾸어 다시 클릭됨을 막기
           if (numOfMines === 0) {
             //주변 8칸 동시 오픈
             let aroundCells = [
@@ -108,19 +135,29 @@ document.querySelector("#exec").addEventListener("click", () => {
                 tbody.children[row + 1].children[col + 1],
               ]);
             }
-            console.log(aroundCells);
-            console.log(aroundCells.filter((v) => !!v));
+
             aroundCells
-              .filter(function (v) {
-                return !!v;
-              })
-              .forEach(function (nextCell) {
-                nextCell.click();
+              .filter((v) => !!v) // 배열에서 null, undefined 제거
+              .forEach((nextCell) => {
+                let parentTr = nextCell.closest("tr");
+                let parentTbody = nextCell.closest("tbody");
+                let col = Array.prototype.indexOf.call(
+                  parentTr.children,
+                  nextCell
+                );
+                let row = Array.prototype.indexOf.call(
+                  parentTbody.children,
+                  parentTr
+                );
+                if (dataset[row][col] !== 1) {
+                  nextCell.click();
+                }
               });
-            // aroundCells
-            //   .filter((v) => !!v) // 배열에서 null, undefined 제거
-            //   .forEach((nextCell) => nextCell.click());
           }
+        }
+        if (openedCells == hor * ver - mine) {
+          stopFlag = true;
+          document.querySelector("#result").textContent = "승리!";
         }
       });
       tr.append(td);
